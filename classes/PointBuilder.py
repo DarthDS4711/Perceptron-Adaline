@@ -86,6 +86,15 @@ class PointBuilder:
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
 
+    def add_data(self, data_add):
+        self.data.append(data_add)
+
+
+    def update_graph(self):
+        line_points = np.linspace(1, len(self.data))
+        self.line_error.set_xdata(line_points)
+        self.line_error.set_ydata(self.data)
+
 
     # función que dibuja en el plano la superficie de decisión
     def draw_desition_superface(self, perceptron):

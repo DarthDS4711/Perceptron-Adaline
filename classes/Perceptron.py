@@ -26,7 +26,7 @@ class Perceptron:
         # variable de numero de épocas requeridas
         self.__number_of_epochs = 0
         # variable que representa la presión del adaline
-        self.__precision = 0.01
+        self.__precision = 0
 
 
     def get_epochs(self):
@@ -135,7 +135,7 @@ class Perceptron:
 
 
     # función de entrenamiento con adaline
-    def train_adaline(self, pointBuilder):
+    def train_adaline(self, pointBuilder, graph_error):
         error_net = [] # lista error por epoca del perceptron
         E_actual = 0
         error = 1
@@ -159,8 +159,10 @@ class Perceptron:
             # calcular error cuadratico medio
             error_w = ((1 / n_samples) * (error_total))
             error = (error_w - error_prev)
-            print(f'error por epoca: {error}')
             n_epochs += 1
+            graph_error.add_data(error)
+            graph_error.update_graph(n_epochs)
+            print(f'error por epoca: {error}')
                 
         if n_epochs < self.__epochs:
             self.__done_learn = True
@@ -168,7 +170,8 @@ class Perceptron:
         pointBuilder.update_line(self.__weigth1, self.__weigth2, self.__weigth0)
 
         
-
+    def set_min_error(self, min_error):
+        self.__precision = min_error
 
 
     def set_epochs(self, epochs):
@@ -188,8 +191,6 @@ class Perceptron:
             self.__x2.append(data[1])
             self.__y.append(1)
         
-    
-
     def inicialize_weigths(self):
         self.__weigth0 = np.random.uniform(0, 1)
         self.__weigth1 = np.random.uniform(0, 1)

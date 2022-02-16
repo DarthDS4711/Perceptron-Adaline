@@ -5,27 +5,31 @@ import matplotlib.pyplot as plt
 from classes.Perceptron import Perceptron
 from classes.PointBuilder import PointBuilder
 from validators.validator import *
+from classes.GraphError import GraphSquareError
 
 
 class Window:
     def __init__(self):
         self.__window = Tk()
-        self.__window.geometry('850x620')
+        self.__window.geometry('1280x620')
         self.__window.wm_title('Perceptron Simple')
-        self.__window.minsize(width=850, height=620)
+        self.__window.minsize(width=1280, height=620)
         # evitar el cambio de tamaño por el usuario
         self.__window.resizable(False, False)
         self.__frame = Frame(self.__window,  bg='gray22', bd=3)
-        self.__frame.grid(row=0, column=0, columnspan=4)
-        fig, ax = plt.subplots()
+        self.__frame.grid(row=0, column=0, columnspan=10)
+        fig, (ax, ax1) = plt.subplots(1, 2)
+        fig.set_size_inches(12.5, 4.6)
         plot = ax.scatter([], [], color='red', marker='o')
         another = ax.scatter([], [], color='blue', marker='o')
         fig_test = ax.scatter([], [], color='black', marker='8')
         line, = ax.plot(0, 0, 'b-')
+        line_error, = ax1.plot(0, 0, 'b-')
         ax.set_xlim([-5, 5])
         ax.set_ylim([-5, 5])
         ax.set_title('Perceptron simple')
         self.__pointsBuilder = PointBuilder(fig, ax, plot, another, line, fig_test)
+        self.__graph_error = GraphSquareError(fig, ax1, line_error)
         self.__perceptron = Perceptron()
         # agregar el gráfico a la ventana
         self.__canvas = FigureCanvasTkAgg(fig, master=self.__frame)
@@ -45,15 +49,21 @@ class Window:
 
         self.__btn6 = Button(self.__window, text='Quit', bg='red', fg='white',
                              command=self.quit, width=15)
+        self.__btn7 = Button(self.__window, text='Restart', bg='magenta', fg='white',
+                             command=self.quit, width=15)
         # botones relacionados a los entrys
         self.__btn_epochs = Button(self.__window, text='Asign',
                                    command=self.get_epochs, width=15)
         self.__btn_learning_rate = Button(self.__window, text='Asign',
                                           command=self.get_learning_rate, width=15)
+        self.__btn_min_error = Button(self.__window, text='Asign',
+                                          command=self.get_min_error, width=15)
 
         # inicialización de entrys
         self.__entry_epochs = Entry(self.__window)
         self.__entry_learning_rate = Entry(self.__window)
+        self.__entry_min_error = Entry(self.__window)
+        # cajas de texto que muestran la información del programa
         self.__text_theta = Text(
             self.__window, height=1, width=24, state=tkinter.DISABLED)
         self.__text_epochs = Text(
@@ -64,6 +74,7 @@ class Window:
         # inicialización de labels (relacionados a los entrys)
         Label(self.__window, text='N° Epochs: ').grid(row=3, column=0)
         Label(self.__window, text='Learning Rate: ').grid(row=4, column=0)
+        Label(self.__window, text='Min error: ').grid(row=5, column=0)
         # inicialización de label relacionado a entrys de información
         Label(self.__window, text='Final Value theta: ').grid(row=3, column=3)
         Label(self.__window, text='Final number epochs: ').grid(row=4, column=3)
@@ -79,6 +90,7 @@ class Window:
         # Entrys relacionados a ingresar información al programa
         self.__entry_epochs.grid(row=3, column=1)
         self.__entry_learning_rate.grid(row=4, column=1)
+        self.__entry_min_error.grid(row=5, column=1)
         # entrys relacionados con desplegar información
         self.__text_theta.grid(row=3, column=4)
         self.__text_epochs.grid(row=4, column=4)
@@ -91,10 +103,12 @@ class Window:
         self.__btn3.grid(row=1, column=2)
         self.__btn4.grid(row=1, column=3)
         self.__btn5.grid(row=1, column=4)
-        self.__btn6.grid(row=0, column=4)
+        self.__btn6.grid(row=1, column=5)
+        self.__btn7.grid(row=1, column=6)
         # botones relacionados a los entrys
         self.__btn_epochs.grid(row=3, column=2)
-        self.__btn_learning_rate .grid(row=4, column=2)
+        self.__btn_learning_rate.grid(row=4, column=2)
+        self.__btn_min_error.grid(row=5, column=2)
 
     
     # boton para finalizar la execución de la aplicación
@@ -117,9 +131,11 @@ class Window:
         if state:
             self.__btn_epochs['state'] = tkinter.DISABLED
             self.__btn_learning_rate['state'] = tkinter.DISABLED
+            self.__btn_min_error['state'] = tkinter.DISABLED
         else:
             self.__btn_epochs['state'] = tkinter.NORMAL
             self.__btn_learning_rate['state'] = tkinter.NORMAL
+            self.__btn_min_error['state'] = tkinter.NORMAL
 
 
    # función para mostrar la información por pantalla
@@ -162,7 +178,7 @@ class Window:
                 self.__perceptron.set_inputs_outpus(self.__pointsBuilder.get_data_class_one(),
                     self.__pointsBuilder.get_data_class_two())
             
-                self.__perceptron.train_adaline(self.__pointsBuilder)
+                self.__perceptron.train_adaline(self.__pointsBuilder, self.__graph_error)
                 self.show_info()
                 self.__pointsBuilder.change_class(-1)
                 self.__btn5['state'] = tkinter.NORMAL
@@ -205,6 +221,19 @@ class Window:
             self.__perceptron.set_factor_learning(learning_rate)
             messagebox.showinfo(
                 message="Factor de aprendizaje agregado correctamente", title="Éxito")
+
+    # función que obtiene el error minimo
+    def get_min_error(self):
+        min_error = self.__entry_min_error.get()
+        self.__entry_min_error.delete("0", "end")
+        if not validate_float(min_error):
+            messagebox.showinfo(
+                message="Error minimo incorrecto", title="Error")
+        else:
+            min_error = float(min_error)
+            self.__perceptron.set_min_error(min_error)
+            messagebox.showinfo(
+                message="Error minimo agregado correctamente", title="Éxito")
 
     # función relacionada a la obtención del número de epocas
     def get_epochs(self):

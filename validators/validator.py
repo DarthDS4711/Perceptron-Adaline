@@ -11,7 +11,7 @@ def validate_integer(number):
 def validate_float(number):
     try:
         number = float(number)
-        if number <= 0.0 or number>1.0:
+        if number <= 0.0 or number > 1.0:
             return False
         else:
             return True
