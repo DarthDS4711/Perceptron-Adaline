@@ -9,9 +9,11 @@ class PointBuilder:
         self.plot = plot
         self.another = another
         self.fig_test = fig_test
-        # figuras del barrido
+        # figuras del barrido del canvas
         self.fig_x = self.ax.scatter([], [], color='darkred', marker='.')
         self.fig_y = self.ax.scatter([], [], color='darkcyan', marker='.')
+        self.fig_w = self.ax.scatter([], [], color='tomato', marker='.')
+        self.fig_z = self.ax.scatter([], [], color='cyan', marker='.')
         # conexión del evento para detección de clicks
         self.cid = self.fig.figure.canvas.mpl_connect('button_press_event', self)
         self.dataPlot = []
@@ -19,6 +21,8 @@ class PointBuilder:
         # datos de el barrido
         self.dataPlot3 = []
         self.dataPlot4 = []
+        self.dataPlot5 = []
+        self.dataPlot6 = []
         self.class_data = -1 
         # linea que representa la fontera de decisión
         self.__line = line
@@ -74,6 +78,24 @@ class PointBuilder:
                 self.fig_y.set_offsets(self.dataPlot4)
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
+
+    # función que agrega el barrido al canvas con los datos proporcionados del adaline
+    def set_new_points_adaline(self, x1, x2, predict_class):
+        if predict_class >= 0 and predict_class < 0.25:
+            self.dataPlot3.append((x1, x2))
+            self.fig_x.set_offsets(self.dataPlot3)
+        elif predict_class >= 0.25 and predict_class < 0.5:
+            self.dataPlot5.append((x1, x2))
+            self.fig_w.set_offsets(self.dataPlot5)
+        elif predict_class >= 0.5 and predict_class < 0.75:
+            self.dataPlot6.append((x1, x2))
+            self.fig_z.set_offsets(self.dataPlot6)
+        elif predict_class >= 0.75 and predict_class <= 1.0:
+            self.dataPlot4.append((x1, x2))
+            self.fig_y.set_offsets(self.dataPlot4)
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
+
     
 
     # función que nos actualiza la línea de la frontera de decisión
@@ -96,7 +118,7 @@ class PointBuilder:
         self.line_error.set_ydata(self.data)
 
 
-    # función que dibuja en el plano la superficie de decisión
+    # función que dibuja en el plano la superficie de decisión (perceptron simple)
     def draw_desition_superface(self, perceptron):
         n_points = 50
         n_points_y = 12
@@ -108,6 +130,20 @@ class PointBuilder:
                 x = feature_x[subIndex]
                 class_predicted = perceptron.return_value_of_z_out_of_train(x, y)
                 self.set_new_points(x, y, class_predicted)
+
+    # función que dibuja en el plano la superficie de desición adaline
+    def draw_desition_adaline_superface(self, perceptron):
+        n_points = 50
+        n_points_y = 12
+        feature_x = np.linspace(-5, 5, n_points)
+        feature_y = np.linspace(-4.7, 4.7, n_points_y)
+        for index in range(0, n_points_y):
+            y = feature_y[index]
+            for subIndex in range(0, n_points):
+                x = feature_x[subIndex]
+                class_predicted = perceptron.return_value_of_f_y_for_predict(x, y, 1)
+                self.set_new_points_adaline(x, y, class_predicted)
+
         
 
     def change_class(self, class_data):

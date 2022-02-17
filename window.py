@@ -11,7 +11,7 @@ from classes.GraphError import GraphSquareError
 class Window:
     def __init__(self):
         self.__window = Tk()
-        self.__window.geometry('1280x620')
+        self.__window.geometry('1280x720')
         self.__window.wm_title('Perceptron Simple')
         self.__window.minsize(width=1280, height=620)
         # evitar el cambio de tamaño por el usuario
@@ -79,12 +79,37 @@ class Window:
         Label(self.__window, text='Final Value theta: ').grid(row=3, column=3)
         Label(self.__window, text='Final number epochs: ').grid(row=4, column=3)
         Label(self.__window, text='Train: ').grid(row=5, column=3)
+        # labels relacionados a la matriz de confusión
+        Label(self.__window, text='Predicción').grid(row=6, column=2)
+        Label(self.__window, text='Positivo').grid(row=7, column=2)
+        Label(self.__window, text='Negativo').grid(row=7, column=3)
+        Label(self.__window, text='Actual').grid(row=7, column=0, rowspan=4)
+        Label(self.__window, text='Positivo').grid(row=8, column=1)
+        Label(self.__window, text='Negativo').grid(row=9, column=1)
+
+        # sección de entrys para la matriz de confusión
+        self.__text_true_positives = Text(
+            self.__window, height=1, width=24, state=tkinter.DISABLED)
+        self.__text_false_positives = Text(
+            self.__window, height=1, width=24, state=tkinter.DISABLED)
+        self.__text_false_negative = Text(
+            self.__window, height=1, width=24, state=tkinter.DISABLED)
+        self.__text_true_negative = Text(
+            self.__window, height=1, width=24, state=tkinter.DISABLED)
 
         # sección para inicializar los botones
         self.set_buttons()
         self.set_entrys()
+        # sección para inicializar la matriz de confusión
+        self.set_entry_confuse_matrix()
 
         self.__window.mainloop()
+
+    def set_entry_confuse_matrix(self):
+        self.__text_true_positives.grid(row=8, column=2)
+        self.__text_false_positives.grid(row=8, column=3)
+        self.__text_false_negative.grid(row=9, column=2)
+        self.__text_true_negative.grid(row=9, column=3)
 
     def set_entrys(self):
         # Entrys relacionados a ingresar información al programa
@@ -121,10 +146,18 @@ class Window:
             self.__text_theta['state'] = tkinter.NORMAL
             self.__text_epochs['state'] = tkinter.NORMAL
             self.__text_train['state'] = tkinter.NORMAL
+            self.__text_true_positives['state'] = tkinter.NORMAL
+            self.__text_false_positives['state'] = tkinter.NORMAL
+            self.__text_false_negative['state'] = tkinter.NORMAL
+            self.__text_true_negative['state'] = tkinter.NORMAL
         else:
             self.__text_theta['state'] = tkinter.DISABLED
             self.__text_epochs['state'] = tkinter.DISABLED
             self.__text_train['state'] = tkinter.DISABLED
+            self.__text_true_positives['state'] = tkinter.DISABLED
+            self.__text_false_positives['state'] = tkinter.DISABLED
+            self.__text_false_negative['state'] = tkinter.DISABLED
+            self.__text_true_negative['state'] = tkinter.DISABLED
 
     # función que actualiza el estado de los botones relacionados a los inputs
     def update_buttons_entrys(self, state):
@@ -147,6 +180,12 @@ class Window:
             self.__text_train.insert('1.0', "OK")
        else:
            self.__text_train.insert('1.0', "Error")
+       # obtención de los datos para la matriz de confusión
+       n_true_positive, n_false_positive, n_true_negative, n_false_negative = self.__perceptron.return_data_of_confuse_matrix()
+       self.__text_true_positives.insert('1.0', str(n_true_positive))
+       self.__text_false_positives.insert('1.0', str(n_false_positive))
+       self.__text_false_negative.insert('1.0', str(n_false_negative))
+       self.__text_true_negative.insert('1.0', str(n_true_negative))
        self.update_text_boxes(False)
 
     # función que nos valida si existe información previa para entrenar
@@ -207,7 +246,7 @@ class Window:
 
     # evaluación de los puntos obtenidos posteriores al entrenamiento
     def evaluate_points(self):
-        self.__pointsBuilder.draw_desition_superface(self.__perceptron)
+        self.__pointsBuilder.draw_desition_adaline_superface(self.__perceptron)
 
     # función para obtener el learning rate
     def get_learning_rate(self):

@@ -60,6 +60,16 @@ class Perceptron:
         else:
             return 0
 
+    def return_value_of_f_y_for_predict(self, x1, x2, type):
+        y = (x1 * self.__weigth1) + (x2 * self.__weigth2) +  (self.__weigth0 * self.__bias)
+        y = self.__sigmode(y)
+        match type:
+            case 1:
+                return y
+            case 2:
+                return round(y)
+
+
 
     # funcion que nos hace el la obtención de los datos
     def __obtain_data(self, pointBuilder):
@@ -151,23 +161,60 @@ class Perceptron:
                 y = self.__return_value_of_net(index)
                 y = self.__sigmode(y)
                 E_actual = (self.__y[index] - y)
-                print(f'y: {y}     d: {self.__y[index]}     error: {E_actual}')
                 self.__adjust_weigths_adaline(E_actual, index, y)
                 error_total = error_total + ((E_actual) ** 2)
                 pointBuilder.update_line(self.__weigth1, self.__weigth2, self.__weigth0)
-                time.sleep(0.15)
+                time.sleep(0.1)
             # calcular error cuadratico medio
             error_w = ((1 / n_samples) * (error_total))
             error = (error_w - error_prev)
             n_epochs += 1
             graph_error.add_data(error)
             graph_error.update_graph(n_epochs)
-            print(f'error por epoca: {error}')
                 
         if n_epochs < self.__epochs:
             self.__done_learn = True
         self.__number_of_epochs = n_epochs
         pointBuilder.update_line(self.__weigth1, self.__weigth2, self.__weigth0)
+
+    # subfunciones para la evaluación de casos
+    def __positive_case(self, x1, x2):
+        y = self.return_value_of_f_y_for_predict(x1, x2, 2)
+        print(y)
+        return True if y == 0 else False
+
+    def __negative_case(self, x1, x2):
+        y = self.return_value_of_f_y_for_predict(x1, x2, 2)
+        print(y)
+        return True if y == 1 else False
+
+    # función que nos devuelve los valores de la matriz de confusión
+    def return_data_of_confuse_matrix(self):
+        n_samples = len(self.__y)
+        # variables a retornar
+        n_true_positive = 0
+        n_true_negative = 0
+        n_false_positive = 0
+        n_false_negative = 0
+        for index in range(0, n_samples):
+            x1 = self.__x1[index]
+            x2 = self.__x2[index]
+            match self.__y[index]:
+                case 0:
+                    if self.__positive_case(x1, x2):
+                        n_true_positive += 1
+                    else:
+                        n_false_positive += 1
+                case 1:
+                    if self.__negative_case(x1, x2):
+                        n_true_negative += 1
+                    else:
+                        n_false_negative += 1
+        print(f'true positive: {n_true_positive}')
+        print(f'false positive: {n_false_positive}')
+        print(f'true negative: {n_true_negative}')
+        print(f'false negative: {n_false_negative}')
+        return n_true_positive, n_false_positive, n_true_negative, n_false_negative
 
         
     def set_min_error(self, min_error):
