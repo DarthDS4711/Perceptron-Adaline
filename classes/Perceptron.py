@@ -227,6 +227,9 @@ class Perceptron:
     def set_factor_learning(self, factor_learning):
         self.__factor_learning = 2 * factor_learning
 
+    def return_n_samples(self):
+        return len(self.__y)
+
     
     def set_inputs_outpus(self, xdata, xdata1):
         for data in xdata:

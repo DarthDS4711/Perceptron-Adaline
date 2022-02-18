@@ -12,8 +12,9 @@ class Window:
     def __init__(self):
         self.__window = Tk()
         self.__window.geometry('1280x720')
-        self.__window.wm_title('Perceptron Simple')
-        self.__window.minsize(width=1280, height=620)
+        self.__window.wm_title('Perceptron Adaline')
+        self.__window.minsize(width=1280, height=720)
+
         # evitar el cambio de tamaño por el usuario
         self.__window.resizable(False, False)
         self.__frame = Frame(self.__window,  bg='gray22', bd=3)
@@ -27,10 +28,11 @@ class Window:
         line_error, = ax1.plot(0, 0, 'b-')
         ax.set_xlim([-5, 5])
         ax.set_ylim([-5, 5])
-        ax.set_title('Perceptron simple')
+        ax.set_title('Perceptron Adaline')
         self.__pointsBuilder = PointBuilder(fig, ax, plot, another, line, fig_test)
         self.__graph_error = GraphSquareError(fig, ax1, line_error)
         self.__perceptron = Perceptron()
+
         # agregar el gráfico a la ventana
         self.__canvas = FigureCanvasTkAgg(fig, master=self.__frame)
         self.__canvas.get_tk_widget().grid(row=0, column=0, columnspan=4)
@@ -63,6 +65,7 @@ class Window:
         self.__entry_epochs = Entry(self.__window)
         self.__entry_learning_rate = Entry(self.__window)
         self.__entry_min_error = Entry(self.__window)
+
         # cajas de texto que muestran la información del programa
         self.__text_theta = Text(
             self.__window, height=1, width=24, state=tkinter.DISABLED)
@@ -75,10 +78,12 @@ class Window:
         Label(self.__window, text='N° Epochs: ').grid(row=3, column=0)
         Label(self.__window, text='Learning Rate: ').grid(row=4, column=0)
         Label(self.__window, text='Min error: ').grid(row=5, column=0)
+
         # inicialización de label relacionado a entrys de información
         Label(self.__window, text='Final Value theta: ').grid(row=3, column=3)
         Label(self.__window, text='Final number epochs: ').grid(row=4, column=3)
         Label(self.__window, text='Train: ').grid(row=5, column=3)
+
         # labels relacionados a la matriz de confusión
         Label(self.__window, text='Predicción').grid(row=6, column=2)
         Label(self.__window, text='Positivo').grid(row=7, column=2)
@@ -86,6 +91,13 @@ class Window:
         Label(self.__window, text='Actual').grid(row=7, column=0, rowspan=4)
         Label(self.__window, text='Positivo').grid(row=8, column=1)
         Label(self.__window, text='Negativo').grid(row=9, column=1)
+
+        # labels de resultado de la matriz de confusión
+        self.__lbl1 = Label(self.__window, text='0')
+        self.__lbl2 = Label(self.__window, text='0')
+        self.__lbl3 = Label(self.__window, text='0')
+        self.__lbl4 = Label(self.__window, text='0')
+        self.__lbl5 = Label(self.__window, text='0')
 
         # sección de entrys para la matriz de confusión
         self.__text_true_positives = Text(
@@ -110,6 +122,13 @@ class Window:
         self.__text_false_positives.grid(row=8, column=3)
         self.__text_false_negative.grid(row=9, column=2)
         self.__text_true_negative.grid(row=9, column=3)
+
+        # labels de resultado
+        self.__lbl1.grid(row=10, column=2) # resultado de verdaderos positivos + falsos positivos
+        self.__lbl2.grid(row=10, column=3) # resultado de verdaderos negativos + falsos negativos
+        self.__lbl3.grid(row=8, column=4) # resultado de verdaderos positivos + falsos negativos
+        self.__lbl4.grid(row=9, column=4) # resultado de verdaderos negativos + falsos positivos
+        self.__lbl5.grid(row=10, column=4) # datos totales
 
     def set_entrys(self):
         # Entrys relacionados a ingresar información al programa
@@ -180,12 +199,20 @@ class Window:
             self.__text_train.insert('1.0', "OK")
        else:
            self.__text_train.insert('1.0', "Error")
+
        # obtención de los datos para la matriz de confusión
        n_true_positive, n_false_positive, n_true_negative, n_false_negative = self.__perceptron.return_data_of_confuse_matrix()
        self.__text_true_positives.insert('1.0', str(n_true_positive))
        self.__text_false_positives.insert('1.0', str(n_false_positive))
        self.__text_false_negative.insert('1.0', str(n_false_negative))
        self.__text_true_negative.insert('1.0', str(n_true_negative))
+
+       # set de información a los labels de resultado
+       self.__lbl1["text"] = (str(n_true_positive + n_false_negative)) 
+       self.__lbl2["text"] = (str(n_true_negative + n_false_positive)) 
+       self.__lbl3["text"] = (str(n_true_positive + n_false_positive))
+       self.__lbl4["text"] = (str(n_true_negative + n_false_negative)) 
+       self.__lbl5["text"] = (str(self.__perceptron.return_n_samples()))
        self.update_text_boxes(False)
 
     # función que nos valida si existe información previa para entrenar

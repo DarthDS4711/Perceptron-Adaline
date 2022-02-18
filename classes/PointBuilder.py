@@ -38,9 +38,6 @@ class PointBuilder:
         # si la figura no contiene un evento
         if event.inaxes!=self.ax.axes: 
             return
-        # impresión de las pocisiones marcadas por el mouse
-        print(f'Position X: {event.xdata}')
-        print(f'Position Y: {event.ydata}')
         # si el contador es par se pone de un color diferente que si no lo es
         match self.class_data:
             case 0:
@@ -62,7 +59,7 @@ class PointBuilder:
         self.fig_test = self.ax.scatter([], [], color='black', marker='8')
         self.ax.set_xlim([-5, 5])
         self.ax.set_ylim([-5, 5])
-        self.ax.set_title('Perceptron simple')
+        self.ax.set_title('Perceptron Adaline')
         
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
