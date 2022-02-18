@@ -33,7 +33,7 @@ _Ejecutar el archivo main.py con el comando python main.py en la carpeta raiz_
 
 ## Versionado 📌
 
-* Proximamente
+* Version 2.1.0 AP
 
 ## Autores ✒️
 

@@ -69,8 +69,6 @@ class Perceptron:
             case 2:
                 return round(y)
 
-
-
     # funcion que nos hace el la obtención de los datos
     def __obtain_data(self, pointBuilder):
         data = []
@@ -134,7 +132,7 @@ class Perceptron:
     def __return_value_of_net(self, index):
         y = (self.__x1[index] * self.__weigth1) + \
             (self.__x2[index] * self.__weigth2) +  (self.__weigth0 * self.__bias)
-        return y
+        return self.__sigmode(y)
 
 
      # ajuste de pesos conforme a Adaline
@@ -146,7 +144,6 @@ class Perceptron:
 
     # función de entrenamiento con adaline
     def train_adaline(self, pointBuilder, graph_error):
-        error_net = [] # lista error por epoca del perceptron
         E_actual = 0
         error = 1
         error_w = 0 # error cuadrático medio
@@ -159,7 +156,6 @@ class Perceptron:
             error_prev = error_w
             for index in range (0, n_samples):
                 y = self.__return_value_of_net(index)
-                y = self.__sigmode(y)
                 E_actual = (self.__y[index] - y)
                 self.__adjust_weigths_adaline(E_actual, index, y)
                 error_total = error_total + ((E_actual) ** 2)
@@ -210,10 +206,6 @@ class Perceptron:
                         n_true_negative += 1
                     else:
                         n_false_negative += 1
-        print(f'true positive: {n_true_positive}')
-        print(f'false positive: {n_false_positive}')
-        print(f'true negative: {n_true_negative}')
-        print(f'false negative: {n_false_negative}')
         return n_true_positive, n_false_positive, n_true_negative, n_false_negative
 
         
