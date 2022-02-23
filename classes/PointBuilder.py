@@ -2,13 +2,12 @@ import numpy as np
 
 
 class PointBuilder:
-    def __init__(self, fig, ax, plot, another, line, fig_test):
+    def __init__(self, fig, ax):
         # figuras del canvas
         self.fig = fig
         self.ax = ax
-        self.plot = plot
-        self.another = another
-        self.fig_test = fig_test
+        self.plot = self.ax.scatter([], [], color='red', marker='o')
+        self.another = self.ax.scatter([], [], color='blue', marker='o')
         # figuras del barrido del canvas
         self.fig_x = self.ax.scatter([], [], color='darkred', marker='.')
         self.fig_y = self.ax.scatter([], [], color='darkcyan', marker='.')
@@ -25,7 +24,7 @@ class PointBuilder:
         self.dataPlot6 = []
         self.class_data = -1 
         # linea que representa la fontera de decisión
-        self.__line = line
+        self.__line, = self.ax.plot(0, 0, 'b-')
 
     # función que nos actualizará el estado del evento de clicks
     def update_state_event(self, state):
@@ -49,20 +48,6 @@ class PointBuilder:
         # actualización de la figura
         self.fig.canvas.draw()
 
-
-
-    # asignar de nueva cuenta, los datos iniciales (valores de entrenamiento) del gráfico
-    def set_data_again(self):
-        self.plot = self.ax.scatter([], [], color='red', marker='x')
-        self.another = self.ax.scatter([], [], color='blue', marker='o')
-        self.__line, = self.ax.plot(0, 0, 'b-')
-        self.fig_test = self.ax.scatter([], [], color='black', marker='8')
-        self.ax.set_xlim([-5, 5])
-        self.ax.set_ylim([-5, 5])
-        self.ax.set_title('Perceptron Adaline')
-        
-        self.fig.canvas.draw()
-        self.fig.canvas.flush_events()
 
     # función que nos actualiza los datos que fueron evaluados, para su ubicación en una clase
     def set_new_points(self, x1, x2, class_data):
@@ -108,25 +93,31 @@ class PointBuilder:
     def add_data(self, data_add):
         self.data.append(data_add)
 
-
-    def update_graph(self):
-        line_points = np.linspace(1, len(self.data))
-        self.line_error.set_xdata(line_points)
-        self.line_error.set_ydata(self.data)
-
-
-    # función que dibuja en el plano la superficie de decisión (perceptron simple)
-    def draw_desition_superface(self, perceptron):
-        n_points = 50
-        n_points_y = 12
-        feature_x = np.linspace(-5, 5, n_points)
-        feature_y = np.linspace(-4.7, 4.7, n_points_y)
-        for index in range(0, n_points_y):
-            y = feature_y[index]
-            for subIndex in range(0, n_points):
-                x = feature_x[subIndex]
-                class_predicted = perceptron.return_value_of_z_out_of_train(x, y)
-                self.set_new_points(x, y, class_predicted)
+    # metodo que limpia de manera completa, los datos presentes en el programa
+    def clear_graph(self):
+        # limpiar los datos de los arrays para los gráficos
+        self.dataPlot = []
+        self.dataPlot2 = []
+        self.dataPlot3 = []
+        self.dataPlot4 = []
+        self.dataPlot5 = []
+        self.dataPlot6 = []
+        self.class_data = -1  
+        # restablecer los subgraficos del gráfico principal
+        self.ax.cla()
+        self.plot = self.ax.scatter([], [], color='red', marker='o')
+        self.another = self.ax.scatter([], [], color='blue', marker='o')
+        self.__line, = self.ax.plot(0, 0, 'b-')
+        self.ax.set_xlim([-5, 5])
+        self.ax.set_ylim([-5, 5])
+        self.ax.set_title('Perceptron Adaline')
+        # reestablecer el barrido del perceptron
+        self.fig_x = self.ax.scatter([], [], color='darkred', marker='.')
+        self.fig_y = self.ax.scatter([], [], color='darkcyan', marker='.')
+        self.fig_w = self.ax.scatter([], [], color='tomato', marker='.')
+        self.fig_z = self.ax.scatter([], [], color='cyan', marker='.')
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
 
     # función que dibuja en el plano la superficie de desición adaline
     def draw_desition_adaline_superface(self, perceptron):

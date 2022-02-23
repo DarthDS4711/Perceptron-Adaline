@@ -28,6 +28,21 @@ class Perceptron:
         # variable que representa la presión del adaline
         self.__precision = 0
 
+    def restart_perceptron(self):
+        self.__weigth0 = 0
+        self.__weigth1 = 0
+        self.__weigth2 = 0
+        self.__x1 = []
+        self.__x2 = []
+        self.__y = []
+        self.__theta = 0
+        self.__factor_learning = 0
+        self.__epochs = 0
+        self.__bias = -1
+        self.__done_learn = False
+        self.__number_of_epochs = 0
+        self.__precision = 0
+
 
     def get_epochs(self):
         return self.__epochs
@@ -143,7 +158,7 @@ class Perceptron:
 
 
     # función de entrenamiento con adaline
-    def train_adaline(self, pointBuilder, graph_error):
+    def train_adaline(self, pointBuilder, graph_error, type_train):
         E_actual = 0
         error = 1
         error_w = 0 # error cuadrático medio
@@ -151,7 +166,8 @@ class Perceptron:
         error_prev = 0
         n_samples = len(self.__y)
         n_epochs = 0
-        done = False
+        if type_train == 'comparative':
+            self.inicialize_weigths()
         while (n_epochs < self.__epochs) and (np.abs(error) > self.__precision):
             error_prev = error_w
             for index in range (0, n_samples):
@@ -159,8 +175,9 @@ class Perceptron:
                 E_actual = (self.__y[index] - y)
                 self.__adjust_weigths_adaline(E_actual, index, y)
                 error_total = error_total + ((E_actual) ** 2)
-                pointBuilder.update_line(self.__weigth1, self.__weigth2, self.__weigth0)
-                time.sleep(0.1)
+                if type_train == 'non-comparative':
+                    pointBuilder.update_line(self.__weigth1, self.__weigth2, self.__weigth0)
+                    time.sleep(0.1)
             # calcular error cuadratico medio
             error_w = ((1 / n_samples) * (error_total))
             error = (error_w - error_prev)
@@ -171,7 +188,6 @@ class Perceptron:
         if n_epochs < self.__epochs:
             self.__done_learn = True
         self.__number_of_epochs = n_epochs
-        pointBuilder.update_line(self.__weigth1, self.__weigth2, self.__weigth0)
 
     # subfunciones para la evaluación de casos
     def __positive_case(self, x1, x2):

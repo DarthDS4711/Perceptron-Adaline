@@ -11,26 +11,18 @@ from classes.GraphError import GraphSquareError
 class Window:
     def __init__(self):
         self.__window = Tk()
-        self.__window.geometry('1280x720')
+        self.__window.geometry('1280x730')
         self.__window.wm_title('Perceptron Adaline')
-        self.__window.minsize(width=1280, height=720)
 
-        # evitar el cambio de tamaño por el usuario
-        self.__window.resizable(False, False)
         self.__frame = Frame(self.__window,  bg='gray22', bd=3)
         self.__frame.grid(row=0, column=0, columnspan=10)
         fig, (ax, ax1) = plt.subplots(1, 2)
         fig.set_size_inches(12.5, 4.6)
-        plot = ax.scatter([], [], color='red', marker='o')
-        another = ax.scatter([], [], color='blue', marker='o')
-        fig_test = ax.scatter([], [], color='black', marker='8')
-        line, = ax.plot(0, 0, 'b-')
-        line_error, = ax1.plot(0, 0, 'b-')
         ax.set_xlim([-5, 5])
         ax.set_ylim([-5, 5])
         ax.set_title('Perceptron Adaline')
-        self.__pointsBuilder = PointBuilder(fig, ax, plot, another, line, fig_test)
-        self.__graph_error = GraphSquareError(fig, ax1, line_error)
+        self.__pointsBuilder = PointBuilder(fig, ax)
+        self.__graph_error = GraphSquareError(fig, ax1)
         self.__perceptron = Perceptron()
 
         # agregar el gráfico a la ventana
@@ -44,15 +36,16 @@ class Window:
 
         self.__btn3 = Radiobutton(self.__window, text='Blue Rose',command=self.class_flower_white, value=2)
 
-        self.__btn4 = Button(self.__window, padx=5, pady=5, text='Inicialize weigths',
+        self.__btn4 = Button(self.__window, text='Inicialize weigths',
                              command=self.inicialize_random, fg='white', bg='orange')
         self.__btn5 = Button(self.__window, width=15, text='Test', command=self.evaluate_points, 
                             state=tkinter.DISABLED, bg='blue', fg='white')
-
         self.__btn6 = Button(self.__window, text='Quit', bg='red', fg='white',
                              command=self.quit, width=15)
         self.__btn7 = Button(self.__window, text='Restart', bg='magenta', fg='white',
-                             command=self.quit, width=15)
+                             command=self.restart, width=15)
+        self.__btn8 = Button(self.__window, text='Train comparative', bg='green yellow', fg='black',
+                             command=self.adaline_vs_perceptron_simple, width=15)
         # botones relacionados a los entrys
         self.__btn_epochs = Button(self.__window, text='Asign',
                                    command=self.get_epochs, width=15)
@@ -85,12 +78,10 @@ class Window:
         Label(self.__window, text='Train: ').grid(row=5, column=3)
 
         # labels relacionados a la matriz de confusión
-        Label(self.__window, text='Predicción').grid(row=6, column=2)
-        Label(self.__window, text='Positivo').grid(row=7, column=2)
-        Label(self.__window, text='Negativo').grid(row=7, column=3)
-        Label(self.__window, text='Actual').grid(row=7, column=0, rowspan=4)
-        Label(self.__window, text='Positivo').grid(row=8, column=1)
-        Label(self.__window, text='Negativo').grid(row=9, column=1)
+        Label(self.__window, text='Positivo').grid(row=6, column=2)
+        Label(self.__window, text='Negativo').grid(row=6, column=3)
+        Label(self.__window, text='Positivo').grid(row=7, column=1)
+        Label(self.__window, text='Negativo').grid(row=8, column=1)
 
         # labels de resultado de la matriz de confusión
         self.__lbl1 = Label(self.__window, text='0')
@@ -118,17 +109,17 @@ class Window:
         self.__window.mainloop()
 
     def set_entry_confuse_matrix(self):
-        self.__text_true_positives.grid(row=8, column=2)
-        self.__text_false_positives.grid(row=8, column=3)
-        self.__text_false_negative.grid(row=9, column=2)
-        self.__text_true_negative.grid(row=9, column=3)
+        self.__text_true_positives.grid(row=7, column=2)
+        self.__text_false_positives.grid(row=7, column=3)
+        self.__text_false_negative.grid(row=8, column=2)
+        self.__text_true_negative.grid(row=8, column=3)
 
         # labels de resultado
-        self.__lbl1.grid(row=10, column=2) # resultado de verdaderos positivos + falsos positivos
-        self.__lbl2.grid(row=10, column=3) # resultado de verdaderos negativos + falsos negativos
-        self.__lbl3.grid(row=8, column=4) # resultado de verdaderos positivos + falsos negativos
-        self.__lbl4.grid(row=9, column=4) # resultado de verdaderos negativos + falsos positivos
-        self.__lbl5.grid(row=10, column=4) # datos totales
+        self.__lbl1.grid(row=9, column=2) # resultado de verdaderos positivos + falsos positivos
+        self.__lbl2.grid(row=9, column=3) # resultado de verdaderos negativos + falsos negativos
+        self.__lbl3.grid(row=7, column=4) # resultado de verdaderos positivos + falsos negativos
+        self.__lbl4.grid(row=8, column=4) # resultado de verdaderos negativos + falsos positivos
+        self.__lbl5.grid(row=9, column=4) # datos totales
 
     def set_entrys(self):
         # Entrys relacionados a ingresar información al programa
@@ -149,10 +140,24 @@ class Window:
         self.__btn5.grid(row=1, column=4)
         self.__btn6.grid(row=1, column=5)
         self.__btn7.grid(row=1, column=6)
+        self.__btn8.grid(row=6, column=0)
         # botones relacionados a los entrys
         self.__btn_epochs.grid(row=3, column=2)
         self.__btn_learning_rate.grid(row=4, column=2)
         self.__btn_min_error.grid(row=5, column=2)
+
+    # acción del boton para reiniciar la aplicación
+    def restart(self):
+        self.__perceptron.restart_perceptron()
+        self.__pointsBuilder.clear_graph()
+        self.__graph_error.clear_graph_error()
+        self.update_buttons_entrys(False)
+        self.update_text_boxes(True)
+        self.update_content_entrys_and_labels()
+        self.__btn5['state'] = tkinter.DISABLED
+        self.block_main_buttons(False)
+        self.update_text_boxes(False)
+
 
     
     # boton para finalizar la execución de la aplicación
@@ -177,6 +182,24 @@ class Window:
             self.__text_false_positives['state'] = tkinter.DISABLED
             self.__text_false_negative['state'] = tkinter.DISABLED
             self.__text_true_negative['state'] = tkinter.DISABLED
+
+    # función que actualiza los entrys y los label
+    def update_content_entrys_and_labels(self):
+        # actualización de los entrys
+        self.__text_theta.insert('1.0', " ")
+        self.__text_epochs.insert('1.0', " ")
+        self.__text_train.insert('1.0', " ")
+        self.__text_true_positives.insert('1.0', " ")
+        self.__text_false_positives.insert('1.0', " ")
+        self.__text_false_negative.insert('1.0', " ")
+        self.__text_true_negative.insert('1.0', " ")
+
+        # actualización de los label
+        self.__lbl1["text"] = "0"
+        self.__lbl2["text"] = "0" 
+        self.__lbl3["text"] = "0"
+        self.__lbl4["text"] = "0" 
+        self.__lbl5["text"] = "0"
 
     # función que actualiza el estado de los botones relacionados a los inputs
     def update_buttons_entrys(self, state):
@@ -238,13 +261,14 @@ class Window:
     def train(self):
         if self.__validate_data_to_train():
             if self.__validate_data_epochs_and_flearning():
-                self.block_main_buttons()
+                self.block_main_buttons(True)
                 self.__pointsBuilder.update_state_event(False)
                 self.update_buttons_entrys(True)
                 self.__perceptron.set_inputs_outpus(self.__pointsBuilder.get_data_class_one(),
                     self.__pointsBuilder.get_data_class_two())
             
-                self.__perceptron.train_adaline(self.__pointsBuilder, self.__graph_error)
+                self.__perceptron.train_adaline(self.__pointsBuilder, 
+                    self.__graph_error, type_train='non-comparative')
                 self.show_info()
                 self.__pointsBuilder.change_class(-1)
                 self.__btn5['state'] = tkinter.NORMAL
@@ -255,6 +279,30 @@ class Window:
         else:
             messagebox.showinfo(
                 message="No existen datos en una o las dos clases", title="Error")
+
+    # función que realiza el doble entrenamiento, para comparar adaline vs perceptron simple
+    def adaline_vs_perceptron_simple(self):
+        if self.__validate_data_to_train():
+            if self.__validate_data_epochs_and_flearning():
+                self.block_main_buttons(True)
+                self.__pointsBuilder.update_state_event(False)
+                self.update_buttons_entrys(True)
+                self.__perceptron.set_inputs_outpus(self.__pointsBuilder.get_data_class_one(),
+                    self.__pointsBuilder.get_data_class_two())
+
+                self.__perceptron.train(self.__pointsBuilder)
+                self.__perceptron.train_adaline(self.__pointsBuilder, 
+                    self.__graph_error, type_train='comparative')
+                self.show_info()
+                self.__pointsBuilder.change_class(-1)
+                self.__btn5['state'] = tkinter.NORMAL
+                self.__pointsBuilder.update_state_event(True)
+                pass
+            else:
+                pass
+            pass
+        else:
+            pass
 
     # Cambio en el tipo de flor a mapear
     def class_flower_rose(self):
@@ -314,8 +362,14 @@ class Window:
             messagebox.showinfo(
                 message="Número de epocas agregado correctamente", title="Éxito")
 
-    def block_main_buttons(self):
-        self.__btn1['state'] = tkinter.DISABLED
-        self.__btn2['state'] = tkinter.DISABLED
-        self.__btn3['state'] = tkinter.DISABLED
-        self.__btn4['state'] = tkinter.DISABLED
+    def block_main_buttons(self, state):
+        if state:
+            self.__btn1['state'] = tkinter.DISABLED
+            self.__btn2['state'] = tkinter.DISABLED
+            self.__btn3['state'] = tkinter.DISABLED
+            self.__btn4['state'] = tkinter.DISABLED
+        else:
+            self.__btn1['state'] = tkinter.NORMAL
+            self.__btn2['state'] = tkinter.NORMAL
+            self.__btn3['state'] = tkinter.NORMAL
+            self.__btn4['state'] = tkinter.NORMAL
