@@ -296,13 +296,16 @@ class Window:
                 self.show_info()
                 self.__pointsBuilder.change_class(-1)
                 self.__btn5['state'] = tkinter.NORMAL
+                self.__btn6['state'] = tkinter.NORMAL
+                self.__btn7['state'] = tkinter.NORMAL
                 self.__pointsBuilder.update_state_event(True)
-                pass
             else:
-                pass
+                messagebox.showinfo(
+                    message="Factor de aprendizaje o n épocas no asignado", title="Error")
             pass
         else:
-            pass
+            messagebox.showinfo(
+                message="No existen datos en una o las dos clases", title="Error")
 
     # Cambio en el tipo de flor a mapear
     def class_flower_rose(self):
@@ -368,8 +371,14 @@ class Window:
             self.__btn2['state'] = tkinter.DISABLED
             self.__btn3['state'] = tkinter.DISABLED
             self.__btn4['state'] = tkinter.DISABLED
+            self.__btn6['state'] = tkinter.DISABLED
+            self.__btn7['state'] = tkinter.DISABLED
+            self.__btn8['state'] = tkinter.DISABLED
         else:
             self.__btn1['state'] = tkinter.NORMAL
             self.__btn2['state'] = tkinter.NORMAL
             self.__btn3['state'] = tkinter.NORMAL
             self.__btn4['state'] = tkinter.NORMAL
+            self.__btn6['state'] = tkinter.NORMAL
+            self.__btn7['state'] = tkinter.NORMAL
+            self.__btn8['state'] = tkinter.NORMAL
