@@ -121,7 +121,7 @@ class PointBuilder:
 
     # función que dibuja en el plano la superficie de desición adaline
     def draw_desition_adaline_superface(self, perceptron):
-        n_points = 50
+        n_points = 40
         n_points_y = 12
         feature_x = np.linspace(-5, 5, n_points)
         feature_y = np.linspace(-4.7, 4.7, n_points_y)

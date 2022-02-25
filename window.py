@@ -186,13 +186,13 @@ class Window:
     # función que actualiza los entrys y los label
     def update_content_entrys_and_labels(self):
         # actualización de los entrys
-        self.__text_theta.insert('1.0', " ")
-        self.__text_epochs.insert('1.0', " ")
-        self.__text_train.insert('1.0', " ")
-        self.__text_true_positives.insert('1.0', " ")
-        self.__text_false_positives.insert('1.0', " ")
-        self.__text_false_negative.insert('1.0', " ")
-        self.__text_true_negative.insert('1.0', " ")
+        self.__text_theta.delete("1.0", "end")
+        self.__text_epochs.delete("1.0", "end")
+        self.__text_train.delete("1.0", "end")
+        self.__text_true_positives.delete("1.0", "end")
+        self.__text_false_positives.delete("1.0", "end")
+        self.__text_false_negative.delete("1.0", "end")
+        self.__text_true_negative.delete("1.0", "end")
 
         # actualización de los label
         self.__lbl1["text"] = "0"
