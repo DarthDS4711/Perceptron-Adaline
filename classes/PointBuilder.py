@@ -75,8 +75,6 @@ class PointBuilder:
         elif predict_class >= 0.75 and predict_class <= 1.0:
             self.dataPlot4.append((x1, x2))
             self.fig_y.set_offsets(self.dataPlot4)
-        self.fig.canvas.draw()
-        self.fig.canvas.flush_events()
 
     
 
@@ -121,8 +119,9 @@ class PointBuilder:
 
     # función que dibuja en el plano la superficie de desición adaline
     def draw_desition_adaline_superface(self, perceptron):
-        n_points = 40
-        n_points_y = 12
+        line_points = [] # lista de los datos con su respectivas clases predecidas
+        n_points = 100
+        n_points_y = 18
         feature_x = np.linspace(-5, 5, n_points)
         feature_y = np.linspace(-4.7, 4.7, n_points_y)
         for index in range(0, n_points_y):
@@ -130,7 +129,15 @@ class PointBuilder:
             for subIndex in range(0, n_points):
                 x = feature_x[subIndex]
                 class_predicted = perceptron.return_value_of_f_y_for_predict(x, y, 1)
-                self.set_new_points_adaline(x, y, class_predicted)
+                line_points.append((x, y, class_predicted))
+        for value in line_points:
+            x = value[0]
+            y = value[1]
+            class_data = value[2]
+            self.set_new_points_adaline(x, y, class_data)
+        line_points.clear()
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
 
         
 
